@@ -4,11 +4,12 @@ import { queryClient } from './lib/react-query';
 import { Main } from './features/products';
 
 function App() {
-  return (
+  return (<>
+    <Header />
     <QueryClientProvider client={queryClient}>
-      <Header />
       <Main />
     </QueryClientProvider>
+  </>
   )
 }
 
