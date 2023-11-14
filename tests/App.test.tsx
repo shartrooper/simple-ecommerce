@@ -6,6 +6,6 @@ import React from 'react'
 describe('App', () => {
   it('Vite to be in document', () => {
     render(<App />)
-    expect(screen.getByText('count is 0')).toBeDefined();
+    expect(screen.getByText('Products')).toBeDefined();
   })
 })
