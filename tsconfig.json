@@ -26,6 +26,13 @@
       "vitest/globals",
       "@testing-library/jest-dom"
     ],
+    /* aliases */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    }
   },
   "include": [
     "src"

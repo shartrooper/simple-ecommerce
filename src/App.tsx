@@ -1,5 +1,4 @@
-import { Header } from './features/header';
-
+import { Header } from '@/features/header';
 
 function App() {
 
