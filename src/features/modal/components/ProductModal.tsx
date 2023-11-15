@@ -22,7 +22,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({ product, onClose }) 
 							Close
 						</button>
 					</div>
-					<img src={product.image} alt="Large Product" className="h-80 w-96 object-cover rounded-t-xl" />
+					<img src={product.image} alt="Large Product" className=" h-80 md:h-[32rem] w-96 md:w-[40rem] object-cover rounded-t-xl" />
 					<div className="px-4 py-3 w-72">
 						<span className="text-gray-400 mr-3 uppercase text-xs">ID: {product.product_id}</span>
 						<p className="text-lg font-bold text-black">{product.title}</p>
