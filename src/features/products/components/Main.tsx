@@ -33,7 +33,7 @@ export const Grid: React.FC<{ cards: Product[], contents: ContentItem[] }> = ({ 
 	return <div className="pt-2 w-fit mx-auto grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 
 	justify-items-center justify-center gap-y-20 gap-x-14 mt-10 mb-5
 	">
-		{contents.filter(content => rowPosition(content.position) < cards.length / 3).map(content => {
+		{contents.map(content => {
 			const position = rowPosition(content.position);
 			const milestoneStyle = `${milestoneRows[position]} col-span-full`;
 			return <div key={content.position} className={milestoneStyle} dangerouslySetInnerHTML={{ __html: content.contents }} />
@@ -59,7 +59,7 @@ export const GridContainer: React.FC = () => {
 		{!isDataLoading && <Grid cards={cardItemsChunk} contents={content?.data ?? []} />}
 		<InView
 			rootMargin="100px 0px"
-			onChange={async (inView) => inView && setChunk(prev => prev + ADD_CHUNK)}
+			onChange={async (inView) => inView && setChunk(prev => prev + 9)}
 		/>
 	</section>
 }
