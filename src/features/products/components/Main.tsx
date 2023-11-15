@@ -1,7 +1,9 @@
-import { INITIAL_CHUNK, LARGE_PAGE } from "@/config"
+import { ADD_CHUNK, LARGE_PAGE } from "@/config"
 import { useContent, useProducts } from "../api"
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Product, ContentItem } from "../types";
+import { InView } from "react-intersection-observer";
+
 
 const milestoneRows: Record<number, string> = {
 	1: 'row-start-1',
@@ -26,11 +28,13 @@ export const GridCard: React.FC<{ fields: Product }> = ({ fields }) => {
 
 export const Grid: React.FC<{ cards: Product[], contents: ContentItem[] }> = ({ cards, contents }) => {
 
+	const rowPosition = (pos: string) => parseInt(pos.split('-')[1]);
+
 	return <div className="pt-2 w-fit mx-auto grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 
 	justify-items-center justify-center gap-y-20 gap-x-14 mt-10 mb-5
 	">
-		{contents.map(content => {
-			const position = parseInt(content.position.split('-')[1]);
+		{contents.filter(content => rowPosition(content.position) < cards.length / 3).map(content => {
+			const position = rowPosition(content.position);
 			const milestoneStyle = `${milestoneRows[position]} col-span-full`;
 			return <div key={content.position} className={milestoneStyle} dangerouslySetInnerHTML={{ __html: content.contents }} />
 		}
@@ -42,16 +46,20 @@ export const Grid: React.FC<{ cards: Product[], contents: ContentItem[] }> = ({ 
 export const GridContainer: React.FC = () => {
 	const { data: products, isLoading: productLoading } = useProducts({ page: LARGE_PAGE });
 	const { data: content, isLoading: contentLoading } = useContent({ page: LARGE_PAGE });
-
+	const [chunk, setChunk] = useState(ADD_CHUNK);
 	const cardItemsChunk = useMemo(() => {
 		if (!products) return [];
-		return products.products.slice(0, INITIAL_CHUNK);
-	}, [products]);
+		return products.products.slice(0, chunk);
+	}, [products, chunk]);
 
 	const isDataLoading = productLoading && contentLoading;
 
 	return <section className="mt-20">
 		{isDataLoading && <>Loading!</>}
 		{!isDataLoading && <Grid cards={cardItemsChunk} contents={content?.data ?? []} />}
+		<InView
+			rootMargin="100px 0px"
+			onChange={async (inView) => inView && setChunk(prev => prev + ADD_CHUNK)}
+		/>
 	</section>
 }
