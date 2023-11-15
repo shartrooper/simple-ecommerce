@@ -4,7 +4,7 @@ export type Product = {
 	image: string
 }
 
-export type ProductContent = {
+export type ContentItem = {
 	type: string,
 	contents: string,
 	position: string
@@ -12,7 +12,7 @@ export type ProductContent = {
 
 
 export type ContentsPayload = {
-	data: ProductContent[]
+	data: ContentItem[]
 }
 
 export type ProductsPayload = {

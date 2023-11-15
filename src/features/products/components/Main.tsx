@@ -1,7 +1,17 @@
-import { LARGE_PAGE } from "@/config"
+import { INITIAL_CHUNK, LARGE_PAGE } from "@/config"
 import { useContent, useProducts } from "../api"
 import { useMemo } from "react";
-import { Product, ProductContent } from "../types";
+import { Product, ContentItem } from "../types";
+
+const milestoneRows: Record<number, string> = {
+	1: 'row-start-1',
+	3: 'row-start-3',
+	13: 'row-start-13',
+	21: 'row-start-21',
+	38: 'row-start-38',
+	61: 'row-start-61',
+	100: 'row-start-100',
+}
 
 export const GridCard: React.FC<{ fields: Product }> = ({ fields }) => {
 	return <div className="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl">
@@ -14,17 +24,18 @@ export const GridCard: React.FC<{ fields: Product }> = ({ fields }) => {
 	</div>
 }
 
-export const Grid: React.FC<{ cards: Product[], contents: ProductContent[] }> = ({ cards, contents }) => {
+export const Grid: React.FC<{ cards: Product[], contents: ContentItem[] }> = ({ cards, contents }) => {
 
 	return <div className="pt-2 w-fit mx-auto grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 
 	justify-items-center justify-center gap-y-20 gap-x-14 mt-10 mb-5
 	">
-		{cards.map((card, index) => <GridCard key={`product-${index}`} fields={card} />)}
 		{contents.map(content => {
-			const position = content.position.split('-');
-			return <div key={content.position} className={`row-start-${position[1]} row-end-${parseInt(position[1])+1} col-span-3`} dangerouslySetInnerHTML={{ __html: content.contents }} />
+			const position = parseInt(content.position.split('-')[1]);
+			const milestoneStyle = `${milestoneRows[position]} col-span-full`;
+			return <div key={content.position} className={milestoneStyle} dangerouslySetInnerHTML={{ __html: content.contents }} />
 		}
 		)}
+		{cards.map((card, index) => <GridCard key={`product-${index}`} fields={card} />)}
 	</div>
 }
 
@@ -32,10 +43,9 @@ export const GridContainer: React.FC = () => {
 	const { data: products, isLoading: productLoading } = useProducts({ page: LARGE_PAGE });
 	const { data: content, isLoading: contentLoading } = useContent({ page: LARGE_PAGE });
 
-
 	const cardItemsChunk = useMemo(() => {
 		if (!products) return [];
-		return products.products.slice(0, 27);
+		return products.products.slice(0, INITIAL_CHUNK);
 	}, [products]);
 
 	const isDataLoading = productLoading && contentLoading;
