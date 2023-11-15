@@ -3,6 +3,7 @@ import { useContent, useProducts } from "../api"
 import { useMemo, useState } from "react";
 import { Product, ContentItem } from "../types";
 import { InView } from "react-intersection-observer";
+import { ProductModal } from "@/features/modal";
 
 
 const milestoneRows: Record<number, string> = {
@@ -15,8 +16,8 @@ const milestoneRows: Record<number, string> = {
 	100: 'row-start-100',
 }
 
-export const GridCard: React.FC<{ fields: Product }> = ({ fields }) => {
-	return <div className="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-xl">
+export const GridCard: React.FC<{ fields: Product, handleClick: (product: Product) => void }> = ({ fields, handleClick }) => {
+	return <div className="w-72 bg-white shadow-md rounded-xl duration-500 hover:scale-105 hover:shadow-x cursor-pointer" onClick={() => handleClick(fields)}>
 		<img src={fields.image}
 			alt="Product" className="h-80 w-72 object-cover rounded-t-xl" />
 		<div className="px-4 py-3 w-72">
@@ -26,7 +27,7 @@ export const GridCard: React.FC<{ fields: Product }> = ({ fields }) => {
 	</div>
 }
 
-export const Grid: React.FC<{ cards: Product[], contents: ContentItem[] }> = ({ cards, contents }) => {
+export const Grid: React.FC<{ cards: Product[], contents: ContentItem[], cardCallback: (product: Product) => void }> = ({ cards, contents, cardCallback }) => {
 
 	const rowPosition = (pos: string) => parseInt(pos.split('-')[1]);
 
@@ -39,7 +40,7 @@ export const Grid: React.FC<{ cards: Product[], contents: ContentItem[] }> = ({ 
 			return <div key={content.position} className={milestoneStyle} dangerouslySetInnerHTML={{ __html: content.contents }} />
 		}
 		)}
-		{cards.map((card, index) => <GridCard key={`product-${index}`} fields={card} />)}
+		{cards.map((card, index) => <GridCard key={`product-${index}`} fields={card} handleClick={cardCallback} />)}
 	</div>
 }
 
@@ -47,6 +48,16 @@ export const GridContainer: React.FC = () => {
 	const { data: products, isLoading: productLoading } = useProducts({ page: LARGE_PAGE });
 	const { data: content, isLoading: contentLoading } = useContent({ page: LARGE_PAGE });
 	const [chunk, setChunk] = useState(ADD_CHUNK);
+	const [modalContent, setModalContent] = useState<Product>();
+
+	const handleCardClick = (content: Product) => {
+		setModalContent(content);
+	};
+
+	const handleCloseModal = () => {
+		setModalContent(undefined);
+	};
+
 	const cardItemsChunk = useMemo(() => {
 		if (!products) return [];
 		return products.products.slice(0, chunk);
@@ -56,10 +67,11 @@ export const GridContainer: React.FC = () => {
 
 	return <section className="mt-20">
 		{isDataLoading && <>Loading!</>}
-		{!isDataLoading && <Grid cards={cardItemsChunk} contents={content?.data ?? []} />}
+		{!isDataLoading && <Grid cards={cardItemsChunk} contents={content?.data ?? []} cardCallback={handleCardClick} />}
 		<InView
 			rootMargin="100px 0px"
 			onChange={async (inView) => inView && setChunk(prev => prev + 9)}
 		/>
+		<ProductModal product={modalContent} onClose={handleCloseModal} />
 	</section>
 }
